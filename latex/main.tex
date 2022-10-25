@@ -1,0 +1,67 @@
+\documentclass[a4paper]{article}
+\usepackage{amsmath} %pour tous les trucs de math
+\usepackage{systeme} %pour tous les systemes d'équations
+%\usepackage{ bbold }  %pour toutes les doubles lettres
+\usepackage{amssymb}  %pour les double Lettres
+\usepackage{IEEEtrantools} %pour les équations en collonnes
+\usepackage{amsthm} %pour les preuves
+\usepackage[english]{babel} % la langue utilisée
+\usepackage[utf8]{inputenc} % encodage symboles entrée
+\usepackage[T1]{fontenc} % encodage symboles sortie
+\usepackage{fancyhdr} %pour les entêtes et pied de page
+%\usepackage[math]{blindtext} % pour le Lorem ipsum
+%\usepackage{enumitem} %pour changer les listes
+\usepackage[a4paper,textwidth=15.5cm]{geometry}
+%\usepackage[framed,numbered]{mcode} %MatLab
+\usepackage{graphicx} % pour les graphiques
+%\usepackage{subfig} % pour les doubles figures
+\usepackage{float} % pour bien positionner les figures
+\usepackage[dvipsnames]{xcolor} % pour la couleur du texte et de la page
+%\usepackage{biblatex} % bibliographie
+%\usepackage{csquotes} % pour que la biblio s'adapte à la langue
+\usepackage{prettyref}
+\usepackage[hidelinks]{hyperref} % pour les hyperliens et références(mettre en dernier)
+
+\newrefformat{fig}{Figure~[\ref{#1}]}
+\newrefformat{it}{question~\ref{#1}.}
+\newrefformat{eq}{(\ref{#1})}
+\newrefformat{seq}{Section~\ref{#1}}
+\newrefformat{th}{Theorem~\ref{#1}}
+\newrefformat{lem}{Lemma~\ref{#1}}
+\newrefformat{cor}{Corollary~\ref{#1}}
+\newrefformat{rem}{Remark~\ref{#1}}
+
+\newtheorem{theoreme}{Theorem} %[section]
+\newtheorem{corollaire}{Corollary} %[theorem]
+\newtheorem{lemme}{Lemma} %[theorem]
+\theoremstyle{definition}
+    \newtheorem{definition}{Definition} %[section]
+\theoremstyle{remark}
+     \newtheorem*{remarque}{Remark}
+
+\pagestyle{fancy}
+%\fancyhf{}
+\lhead{Benoît Müller}
+\chead{...}
+\rhead{\today}
+
+\title{titre}
+\author{Benoît Müller}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\argmax}{argmax}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\com}[1]{\textcolor{ForestGreen}{[~\emph{#1}~]}}
+%\newcommand{\nom}[nombre d’arguments]{définition(#1,#2,...,#n)}
+
+\begin{document}
+\maketitle
+\part*{part}
+\section*{section}
+\subsection*{subsection}
+\subsubsection*{subsubsection}
+
+\end{document}
