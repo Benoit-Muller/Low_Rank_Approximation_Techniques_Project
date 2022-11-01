@@ -1,4 +1,4 @@
-# Low_Rank_Approximation_Techniques_Project
+# Low Rank Approximation Techniques Project
 Mini projet du cours Low Rank Approximation Techniques. \
 PDF des références:
 - [1] [Massively scalable Sinkhorn distances via the Nyström method](https://arxiv.org/pdf/1812.05189.pdf)
