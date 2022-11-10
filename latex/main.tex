@@ -17,10 +17,12 @@
 %\usepackage{subfig} % pour les doubles figures
 \usepackage{float} % pour bien positionner les figures
 \usepackage[dvipsnames]{xcolor} % pour la couleur du texte et de la page
-%\usepackage{biblatex} % bibliographie
-%\usepackage{csquotes} % pour que la biblio s'adapte à la langue
+\usepackage[maxbibnames=99]{biblatex} % bibliographie
+\usepackage{csquotes} % pour que la biblio s'adapte à la langue
+\usepackage{url} % joli url
 \usepackage{prettyref}
 \usepackage[hidelinks]{hyperref} % pour les hyperliens et références(mettre en dernier)
+\usepackage{bbold} %pour les 1 doublé qui sont des vecteurs avec que des 1 dedans
 
 \newrefformat{fig}{Figure~[\ref{#1}]}
 \newrefformat{it}{question~\ref{#1}.}
@@ -34,6 +36,7 @@
 \newtheorem{theoreme}{Theorem} %[section]
 \newtheorem{corollaire}{Corollary} %[theorem]
 \newtheorem{lemme}{Lemma} %[theorem]
+\newtheorem*{theorem5}{Theorem 5}
 \theoremstyle{definition}
     \newtheorem{definition}{Definition} %[section]
 \theoremstyle{remark}
@@ -45,8 +48,10 @@
 \chead{...}
 \rhead{\today}
 
-\title{titre}
-\author{Benoît Müller}
+\title{Ladies and gentleman, tonight presenting their Low rank approximation project : }
+\author{{\Huge Benoît Müller} {\Huge Armelle Hours}}
+
+\addbibresource{ref.bib}
 
 \DeclareMathOperator*{\argmin}{argmin}
 \DeclareMathOperator*{\argmax}{argmax}
@@ -56,12 +61,74 @@
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\com}[1]{\textcolor{ForestGreen}{[~\emph{#1}~]}}
 %\newcommand{\nom}[nombre d’arguments]{définition(#1,#2,...,#n)}
+%newcommand defined by Armelle
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\T}{\mathcal{T}}
+
 
 \begin{document}
 \maketitle
-\part*{part}
-\section*{section}
-\subsection*{subsection}
-\subsubsection*{subsubsection}
+\part*{Armelle's part}
+\section*{Question 1}
+\subsection*{Setting of the problem}
+We're interested in the Kantorovich's optimal transport problem. Mainly, we want to match the set $\X=\{x_1,\cdots, x_n\}$ to the set $\Y=\{y_1,\cdots, y_m\}$ knowing that each $x_i$ is associated to a mass $a_i$ and I want each of my $y_j$ to get a mass $b_j$ . Now, each $x_i$ can be linked to several $y_j$ and a $y_j$ can be linked to several $x_i$. But sending mass from $x_i$ to $y_j$ costs and we want to minimize that cost. Do notice that we want exactly $a_i$ to be sent from every $x_i$ and we want every $y_j$ to receive exactly $b_j$.
 
+With an everyday example, it would be like having $n$ warehouses storing the same product and $m$ cities that want that product. Each warehouse produces $w_i$ units of the product and city $j$ wants $u_j$ units of that product. There are roads that go from each warehouse to each of the cities. Several trucks are leaving each of our warehouse. But each time the truck transporting the goods uses a road, it has to pay a tax per unit of the product. So we want to transfer our goods in an optimal way so that we minimize the amount of the taxes we'll pay. (Notice we'll assume we can send fraction of a good, if one warehouse sends one half and the other one another half then we can combine them to make one good). 
+
+To this end, we're given a cost matrix $C$ where $C_{i,j}$ is the cost of sending a unit from $x_i$ to $y_j$. Notice that in practice, we'll have $C_{i,j}>0$.  We'll denote $a=[a_1,\cdots, a_n]^T$ and $b=[b_1,\cdots, b_m]^T$ for readability. Notice that the solution of this optimization problem for $a$ is the same as for $\lambda a$ where $\lambda$ is a scalar. Thus by considering the scalars $\frac{1}{\sum\limits_{i=1}^n a_i}$ and $\frac{1}{\sum\limits_{j=1}^m b_j}$ we can assume WLOG that $\sum\limits_{i=1}^n a_i=1$ and $\sum\limits_{j=1}^m b_j=1$. 
+
+\subsection*{Let's define $P$}
+
+Our goal is to define a matrix $P$ st $P_{i_j}$ is the mass transferred from $x_i$ to $y_j$. Recall that as we want to send exactly $a_i$ from $x_i$, the sum of the $i$th row of $P$ must be equal to $a_i$ and that since we want $y_j$ to receive exactly $b_j$, the sum over the $j$th column of $P$ must be equal to $b_j$. This leads to the condition $P\mathbb{1}_m=a$ and $P^T\mathbb{1}_n=b$. Moreover, since we want to move mass from $x_i$ to $y_j$ (and not the opposite), we assume $P\in \R^{n\times m}_+$. This allows us to reduce our search for the matrix $P$ given $a$ and $b$ to the set $U(a,b)=\{P\in \R^{n\times m}_+: P\mathbb{1}_m=a, P^T\mathbb{1}_n=b\}$.   Notice that since we also have $\sum\limits_{i=1}^n a_i=\sum\limits_{j=1}^m b_j=1$, we'll have $\sum\limits_{i,j}P_{i,j}=1$ and therefore $\forall$ i,j $P_{i,j}\leq 1$ . Also notice that since $U(a,b)$ is defined by equality constraint and is bounded, it is a convex polytope. Now, for each pair $(x_i, y_j)$, for a given cost matrix $C$ and a given coupling matrix $P$, it costs $C_{i,j}*P_{i.j}$ to get $P_{i,j}$ transferred from $x_i$ to $y_j$, thus a given $P$ will cost $\sum\limits_{i,j}C_{i,j}*P_{i.j}$. So our problem can be reformulated as $L_C(a,b)=\min\limits_{P\in U(a,b)}\sum\limits_{i,j}C_{i,j}*P_{i.j}=\min\limits_{P\in U(a,b)}\langle P,C \rangle$. Now every element in the constraint set $U(a,b)$ has $nm$ variables and $n+m$ constraints so if $nm>n+m$, which is the case most of the time, our constraint set will have more than one element. Moreover, $L_C(a,b)$ might have several optimal solutions so if it is the case we have the freedom to choose a solution. 
+
+\subsection*{Choosing among $P$'s}
+
+Suppose we have several optimal solutions to $L_C(a,b)$. Is there any solution that would suit us better than others? Yes there is! We would like one with a high entropy where the entropy of $P$ is defined as $H(P)=-\sum\limits_{i,j}P_{i,j}(\log(P_{i,j}-1))$ and by convention $H(P)=-\infty$ if an entry of $P$ is 0 or negative. Notice that since $0<P_{i,j}\leq 1$ we get that $\log(P_{i,j})\leq 1$ so $H(P)>0$. Indeed the lower the entropy, the sparser the matrix. But in the case of our optimization problem, a sparse $P$ would mean that a few routes are used and actual traffic pattern show that this scenario is unrealistic, and having a non-sparse $P$ allows among others our algorithm to be faster (need to justify this part?). So in order to force the condition of $P$ being non-sparse we define for a given $\epsilon>0$, $L_C^{\epsilon}(a,b)=\min\limits_{P\in U(a,b)}\langle P,C \rangle-\epsilon H(P)$. As $H(P)>0$, the higher our entropy, the less sparse $P$ will be and the more probable $L_C^{\epsilon}(a,b)$ will be to have a non-sparse optimal solution. In the same mindset, the higher the value of $\epsilon$, the more probable our optimal solution will be non-sparse. Moreover, as $H(P)$ is 1-strongly concave ($\partial ^2H(P)=diag(-\frac{1}{P_{i,j}})$ and $P_{i,j}\leq 1$) and $\langle P,C \rangle$ is a linear combination so is convex, we get that $\langle P,C \rangle-\epsilon H(P)$ is $\epsilon$-strongly convex as a function of $P$ over the set $U(a,b)$ which is a convex polytope. This means that its solution is unique and exists. 
+
+\subsection*{How to compute $P$}
+
+Our goal is to find $P$ st $P$ is the optimal solution of the minimization problem $\min\limits_{P\in U(a,b)}\langle P,C \rangle-\epsilon H(P)$. Since we know the optimization function is $\epsilon$-strongly convex, we would like to compute it's gradient and set it to 0 to find $P$. With this in mind, to get rid of the condition $P\in U(a,b)$, we'll use the Lagrange reformulation for our problem. Notice that if $P\notin \R^{n\times m}_+$ then $H(P)=-\infty$ by convention and our minimization problem will be $+\infty$ so if $P$ is an optimal solution, then $P\in \R^{n\times m}_+$. Recall that if $P\in U(a,b)$, then $P\mathbb{1}_m=a$ and $P^T\mathbb{1}_n=b$.  So for a $f\in \R^n$ and $g\in \R^m$ well chosen (i.e with entries high enough to penalize when we don't have the equality and with entry sign ... question how to formulate it), we'll get that our optimization problem formulation is equivalent to $\min \langle P,C \rangle-\epsilon H(P)-f^T(P\mathbb{1}_m-a)-g^T(P\mathbb{1}_n=b)$. We compute the gradient with regard to $P_{i,j}$ and set it to 0 and we get $C_{i,j}+\epsilon \log(P_{i,j})-f_i-g_j=0$ which implies that $P_{i,j}=e^{-\frac{f_i}{\epsilon}}e^{-\frac{C_{i,j}}{\epsilon}}e^{-\frac{g_j}{\epsilon}}$. 
+
+\subsection*{Let's compute $u$ and $v$}
+
+We have seen above that we can write $P=diag(u)Kdiag(v)$ where $K_{i,j}=e^{-\frac{C_{i,j}}{\epsilon}}$, $u\in \R^n_+$, $v\in \R^m_+$ (by property of the exponential). Now let's compute $u$ and $v$. Using the fact that $P\in U(a,b)$ for some $a$, $b$ we get $diag(u)Kdiag(v){1}_m=a$ and $diag(v)K^Tdiag(u)\mathbb{1}_n=b$ which is equivalent to $u\bullet (Kv)=a$ and $v\bullet(K^Tu)=b$ where $\bullet$ is the element-wise multiplication of vectors. And this is well known as the matrix scaling problem and can be computed using Sinkhorn's algorithm (should mention why it works? In this case it will work because $u\in \R^n_+$ and $v\in \R^m_+$, if not maybe it wouldn't have have converged). 
+(I'll ask question in exercise session if I should go further, what should I have focused on and so on...)
+
+\section*{Question 2}
+
+We recall that in the Sinkhorn's algorithm, for a given initial vector $v^{(0)}$ we iterate for some number $N$ of iteration:
+
+$u^{(l+1)}=\frac{a}{Kv^{(l)}}$ (1) \\
+$v^{l+1}=\frac{b}{K^Tu^{l+1}}$  (2)
+
+Now, because of the matrix vector multiplication, both (1) and (2) take $O(nm)$ operations (ask in exercise session if that is correct or do we have algorithm that go faster or is that the convention) and since we run it for a number $N$ or iteration (usually that number of iteration will be 
+(if low rank does it also converge faster? If not will have to make an hypothesis on that or at least state it), the complexity of our algorithm will be $O(2Nmn)$.
+
+Now, let the $\T_r(K)=U_r\Sigma_rV^T_r$ be the optimal approximation of rank $r$ of $K$. Then for a vector $x \in \R^n$, the complexity of $\T_r(K)x$ is $O(r(m+n+1))$. Indeed computing $L=V^T_rx$ takes $O(rn)$, computing $M\Sigma_rL$ takes $O(r)$ (as $\Sigma_r$ is a diagonal matrix) and computing $U_rM$ takes $O(rm)$. With the same reasoning, the complexity for computing $\T_r(K)^Ty$ where $y\in \R^m$ is also $O(r(m+n+1))$. Thus, if we use a low rank approximation, the Sinkhorn's algorithm will run with complexity $O(2Nr(n+m))$. Notice that the lower the rank, the faster it is but that $||K-\T_r(K)||=\sigma_{r+1}$ where $\sigma_1\geq \cdots \geq \sigma_{\min(m,n)}$ so the lower the rank the worse $K$'s approximation becomes. (Would be nice if I could manage to quantify how much information I'm losing). 
+(Also ask to TA how well written it should be. Paper-like or student-5ECTS-project like)
+
+
+\part*{Benoît's part}
+\section*{Question 5}
+\com{en vert pour les commentaires, j'utilise un ptite comande perso.} \\
+
+\com{
+Les notations sont différentes, il faudra les adapter pour la \LaTeX isation. \\
+Structure:
+\begin{itemize}
+    \item Présenter le pseudocode de l'Algo 3 (Sinkhorn) de \cite{ref1}
+    \item Définir les quantités $\tilde{P},\tilde{C},\hat{W},P^\eta,V_C(P)$,...?
+    \item Enoncer le Theorem 5 de \cite{ref1}
+    \item Enoncer les résultats nécessaires: Corollary 1; Propositions 2,3; Lemmas A,C,E,M de \cite{ref1}
+    \item Démontrer le Theorem 5
+\end{itemize}
+}
+
+\begin{theorem5}
+\end{theorem5}
+
+\com{j'ai créé les références ci-dessous dans le fichier "ref.bib". Faire attention au fait que les labels des reférences (ref1,ref2,ref3) c'est ceux tels qu'ils sont dans la description dur projet, ça sera prob. des chifres différents ici.}
+\nocite{*}
+\printbibliography
 \end{document}
