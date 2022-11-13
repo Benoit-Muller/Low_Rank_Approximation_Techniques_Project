@@ -11,10 +11,11 @@
 \usepackage{fancyhdr} %pour les entêtes et pied de page
 %\usepackage[math]{blindtext} % pour le Lorem ipsum
 %\usepackage{enumitem} %pour changer les listes
-\usepackage[a4paper,textwidth=15.5cm]{geometry}
+\usepackage[a4paper]{geometry} %textwidth=15.5cm
 %\usepackage[framed,numbered]{mcode} %MatLab
 \usepackage{graphicx} % pour les graphiques
 %\usepackage{subfig} % pour les doubles figures
+\usepackage[ruled, lined, linesnumbered, commentsnumbered, longend]{algorithm2e} % pour les algos
 \usepackage{float} % pour bien positionner les figures
 \usepackage[dvipsnames]{xcolor} % pour la couleur du texte et de la page
 \usepackage[maxbibnames=99]{biblatex} % bibliographie
@@ -32,6 +33,7 @@
 \newrefformat{lem}{Lemma~\ref{#1}}
 \newrefformat{cor}{Corollary~\ref{#1}}
 \newrefformat{rem}{Remark~\ref{#1}}
+\newrefformat{algo}{Algorithm~\ref{#1}}
 
 \newtheorem{theoreme}{Theorem} %[section]
 \newtheorem{corollaire}{Corollary} %[theorem]
@@ -59,12 +61,25 @@
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\C}{\mathbb{C}}
+\newcommand{\un}{\mathbb{1}}
+\newcommand{\ps}[2]{\langle#1,#2\rangle}
 \newcommand{\com}[1]{\textcolor{ForestGreen}{[~\emph{#1}~]}}
+
+%newcommand defined by Benoît
+\newcommand{\pp}{\mathbf{p}}
+\newcommand{\qq}{\mathbf{q}}
+\newcommand{\Dun}{D_1}
+\newcommand{\Ddeux}{D_2}
+\newcommand{\Mpq}{\mathcal{M}(\pp,\qq)}
+\newcommand{\proj}{\Pi^\mathcal{S}}
+
 %\newcommand{\nom}[nombre d’arguments]{définition(#1,#2,...,#n)}
+
 %newcommand defined by Armelle
 \newcommand{\X}{\mathcal{X}}
 \newcommand{\Y}{\mathcal{Y}}
 \newcommand{\T}{\mathcal{T}}
+
 
 
 \begin{document}
@@ -72,11 +87,13 @@
 \part*{Armelle's part}
 \section*{Question 1}
 \subsection*{Setting of the problem}
-We're interested in the Kantorovich's optimal transport problem. Mainly, we want to match the set $\X=\{x_1,\cdots, x_n\}$ to the set $\Y=\{y_1,\cdots, y_m\}$ knowing that each $x_i$ is associated to a mass $a_i$ and I want each of my $y_j$ to get a mass $b_j$ . Now, each $x_i$ can be linked to several $y_j$ and a $y_j$ can be linked to several $x_i$. But sending mass from $x_i$ to $y_j$ costs and we want to minimize that cost. Do notice that we want exactly $a_i$ to be sent from every $x_i$ and we want every $y_j$ to receive exactly $b_j$.
+We're interested in the Kantorovich's optimal transport problem. Mainly, we want to match the set $\X=\{x_1,\cdots, x_n\}$ to the set $\Y=\{y_1,\cdots, y_m\}$ knowing that each $x_i$ is associated to a mass $a_i$ and I want each of my $y_j$ to get a mass $b_j$ . Now, each $x_i$ can be linked to several $y_j$ and a $y_j$ can be linked to several $x_i$.
+\com{Il y a pas vraiment de notion lié vs pas-lié en transport optimal: tous les $x_i$ peuvent envoyer à tous les $y_i$ (qui seront influencés par le coût dans la recherche d'un coupling qui est optimal)}
+But sending mass from $x_i$ to $y_j$ costs and we want to minimize that cost. Do notice that we want exactly $a_i$ to be sent from every $x_i$ and we want every $y_j$ to receive exactly $b_j$.
 
 With an everyday example, it would be like having $n$ warehouses storing the same product and $m$ cities that want that product. Each warehouse produces $w_i$ units of the product and city $j$ wants $u_j$ units of that product. There are roads that go from each warehouse to each of the cities. Several trucks are leaving each of our warehouse. But each time the truck transporting the goods uses a road, it has to pay a tax per unit of the product. So we want to transfer our goods in an optimal way so that we minimize the amount of the taxes we'll pay. (Notice we'll assume we can send fraction of a good, if one warehouse sends one half and the other one another half then we can combine them to make one good). 
 
-To this end, we're given a cost matrix $C$ where $C_{i,j}$ is the cost of sending a unit from $x_i$ to $y_j$. Notice that in practice, we'll have $C_{i,j}>0$.  We'll denote $a=[a_1,\cdots, a_n]^T$ and $b=[b_1,\cdots, b_m]^T$ for readability. Notice that the solution of this optimization problem for $a$ is the same as for $\lambda a$ where $\lambda$ is a scalar. Thus by considering the scalars $\frac{1}{\sum\limits_{i=1}^n a_i}$ and $\frac{1}{\sum\limits_{j=1}^m b_j}$ we can assume WLOG that $\sum\limits_{i=1}^n a_i=1$ and $\sum\limits_{j=1}^m b_j=1$. 
+To this end, we're given a cost matrix $C$ where $C_{i,j}$ is the cost of sending a unit from $x_i$ to $y_j$. Notice that in practice, we'll have $C_{i,j}>0$.  We'll denote $a=[a_1,\cdots, a_n]^T$ and $b=[b_1,\cdots, b_m]^T$ for readability. Notice that the solution of this optimization problem for $a,b$ is the same as for $\lambda a,\lambda b$ where $\lambda$ is a scalar. Thus by considering the scalars $\frac{1}{\sum\limits_{i=1}^n a_i}$ and $\frac{1}{\sum\limits_{j=1}^m b_j}$ we can assume WLOG that $\sum\limits_{i=1}^n a_i=1$ and $\sum\limits_{j=1}^m b_j=1$. 
 
 \subsection*{Let's define $P$}
 
@@ -88,7 +105,7 @@ Suppose we have several optimal solutions to $L_C(a,b)$. Is there any solution t
 
 \subsection*{How to compute $P$}
 
-Our goal is to find $P$ st $P$ is the optimal solution of the minimization problem $\min\limits_{P\in U(a,b)}\langle P,C \rangle-\epsilon H(P)$. Since we know the optimization function is $\epsilon$-strongly convex, we would like to compute it's gradient and set it to 0 to find $P$. With this in mind, to get rid of the condition $P\in U(a,b)$, we'll use the Lagrange reformulation for our problem. Notice that if $P\notin \R^{n\times m}_+$ then $H(P)=-\infty$ by convention and our minimization problem will be $+\infty$ so if $P$ is an optimal solution, then $P\in \R^{n\times m}_+$. Recall that if $P\in U(a,b)$, then $P\mathbb{1}_m=a$ and $P^T\mathbb{1}_n=b$.  So for a $f\in \R^n$ and $g\in \R^m$ well chosen (i.e with entries high enough to penalize when we don't have the equality and with entry sign ... question how to formulate it), we'll get that our optimization problem formulation is equivalent to $\min \langle P,C \rangle-\epsilon H(P)-f^T(P\mathbb{1}_m-a)-g^T(P\mathbb{1}_n=b)$. We compute the gradient with regard to $P_{i,j}$ and set it to 0 and we get $C_{i,j}+\epsilon \log(P_{i,j})-f_i-g_j=0$ which implies that $P_{i,j}=e^{-\frac{f_i}{\epsilon}}e^{-\frac{C_{i,j}}{\epsilon}}e^{-\frac{g_j}{\epsilon}}$. 
+Our goal is to find $P$ st $P$ is the optimal solution of the minimization problem $\min\limits_{P\in U(a,b)}\langle P,C \rangle-\epsilon H(P)$. Since we know the optimization function is $\epsilon$-strongly convex, we would like to compute it's gradient and set it to 0 to find $P$. With this in mind, to get rid of the condition $P\in U(a,b)$, we'll use the Lagrange reformulation for our problem. Notice that if $P\notin \R^{n\times m}_+$ then $H(P)=-\infty$ by convention and our minimization problem will be $+\infty$ so if $P$ is an optimal solution, then $P\in \R^{n\times m}_+$. Recall that if $P\in U(a,b)$, then $P\mathbb{1}_m=a$ and $P^T\mathbb{1}_n=b$.  So for a $f\in \R^n$ and $g\in \R^m$ well chosen (i.e with entries high enough to penalize when we don't have the equality and with entry sign ... question how to formulate it\com{the Lagrange optimal multipliers (high enough pas suffisant je pense )}), we'll get that our optimization problem formulation is equivalent to $\min \langle P,C \rangle-\epsilon H(P)-f^T(P\mathbb{1}_m-a)-g^T(P\mathbb{1}_n=b)$. We compute the gradient with regard to $P_{i,j}$ and set it to 0 and we get $C_{i,j}+\epsilon \log(P_{i,j})-f_i-g_j=0$ which implies that $P_{i,j}=e^{-\frac{f_i}{\epsilon}}e^{-\frac{C_{i,j}}{\epsilon}}e^{-\frac{g_j}{\epsilon}}$. 
 
 \subsection*{Let's compute $u$ and $v$}
 
@@ -105,13 +122,13 @@ $v^{l+1}=\frac{b}{K^Tu^{l+1}}$  (2)
 Now, because of the matrix vector multiplication, both (1) and (2) take $O(nm)$ operations (ask in exercise session if that is correct or do we have algorithm that go faster or is that the convention) and since we run it for a number $N$ or iteration (usually that number of iteration will be 
 (if low rank does it also converge faster? If not will have to make an hypothesis on that or at least state it), the complexity of our algorithm will be $O(2Nmn)$.
 
-Now, let the $\T_r(K)=U_r\Sigma_rV^T_r$ be the optimal approximation of rank $r$ of $K$. Then for a vector $x \in \R^n$, the complexity of $\T_r(K)x$ is $O(r(m+n+1))$. Indeed computing $L=V^T_rx$ takes $O(rn)$, computing $M\Sigma_rL$ takes $O(r)$ (as $\Sigma_r$ is a diagonal matrix) and computing $U_rM$ takes $O(rm)$. With the same reasoning, the complexity for computing $\T_r(K)^Ty$ where $y\in \R^m$ is also $O(r(m+n+1))$. Thus, if we use a low rank approximation, the Sinkhorn's algorithm will run with complexity $O(2Nr(n+m))$. Notice that the lower the rank, the faster it is but that $||K-\T_r(K)||=\sigma_{r+1}$ where $\sigma_1\geq \cdots \geq \sigma_{\min(m,n)}$ so the lower the rank the worse $K$'s approximation becomes. (Would be nice if I could manage to quantify how much information I'm losing). 
+Now, let the $\T_r(K)=U_r\Sigma_rV^T_r$ be the optimal approximation of rank $r$ of $K$. Then for a vector $x \in \R^n$, the complexity of $\T_r(K)x$ is $O(r(m+n+1))$. Indeed computing $L=V^T_rx$ takes $O(rn)$, computing $M\Sigma_rL$ takes $O(r)$ (as $\Sigma_r$ is a diagonal matrix) and computing $U_rM$ takes $O(rm)$. With the same reasoning, the complexity for computing $\T_r(K)^Ty$ where $y\in \R^m$ is also $O(r(m+n+1))$. Thus, if we use a low rank approximation, the Sinkhorn's algorithm will run with complexity $O(2Nr(n+m))$ (that or $O(2Nr(n+m+1))$?????). Notice that the lower the rank, the faster it is but that $||K-\T_r(K)||_2=\sigma_{r+1}$ where $\sigma_1\geq \cdots \geq \sigma_{\min(m,n)}$ so the lower the rank the worse $K$'s approximation becomes. (Would be nice if I could manage to quantify how much information I'm losing\com{Done? la mesure de l'information perdue est l'erreur $\sigma_{k+1}$}). 
 (Also ask to TA how well written it should be. Paper-like or student-5ECTS-project like)
 
 
 \part*{Benoît's part}
 \section*{Question 5}
-\com{en vert pour les commentaires, j'utilise un ptite comande perso.} \\
+\com{en vert pour les commentaires, j'utilise une ptite commande perso.} \\
 
 \com{
 Les notations sont différentes, il faudra les adapter pour la \LaTeX isation. \\
@@ -124,9 +141,125 @@ Structure:
     \item Démontrer le Theorem 5
 \end{itemize}
 }
+\subsubsection*{Notations}
+$\pp$,$\qq$: the target marginals, probability vectors of dimension $n$.\\
+$\Delta_{n\times n}$: Simplex of probability matrices $\{P\in \R^{n\times n}_{\geq 0}| \un^\top P\un=1\}$. \\
+$\Mpq$: the feasible space of probability matrices that are couplings of $\pp$ and $\qq$.\\
+$\proj$: the Sinkhorn projector that satisfy $V_C(\proj(K))=\min_{P\in\Mpq} V_C(P)$ and 
 
-\begin{theorem5}
+$\proj(K)=\Dun K\Ddeux$ for some diagonals matrices $\Dun$ and $\Ddeux$ .
+
+\quad\\
+\setcounter{algocf}{2}
+\begin{algorithm}[H]
+    \caption{Sinkorn \cite{ref1} \label{algo:sink}}
+    \DontPrintSemicolon
+    \SetKwInOut{Input}{Input}
+    \SetKwInOut{Output}{Output}
+    
+    \Input{$\tilde{K}\in R^{n\times n}_{>0}$ (in factored form), $\pp$,$\qq\in \Delta_{n\times n}, \delta>0$}
+    
+    \Output{Positive diagonal matrices $\Dun,\Ddeux\in\R^{n\times n}$, cost $\hat{W}$}
+    $\tau\leftarrow\delta/8$ \;
+    $\Dun,\Ddeux \leftarrow I_{n\times n}$ \;
+    $k \leftarrow 0$ \;
+    $\pp' \leftarrow (1-\tau)\pp + \frac{\tau}{n}\un$ \;
+    $\qq' \leftarrow (1-\tau)\qq + \frac{\tau}{n}\un$ \;
+    
+    \While{$\|\Dun\tilde{K}\Ddeux\un-p'\|_1 + \|(\Dun\tilde{K}\Ddeux)^\top\un-q'\|_1 \geq^{\com{typo dans le paper?}} \frac{\delta}{2}$}{
+        $k\leftarrow k+1$ \;
+        \eIf{$k$ is odd}{
+            $ \Dun \leftarrow \pp' / \tilde{K}\Ddeux\un$ \;
+            }{
+            $ \Ddeux \leftarrow \qq' / (\Dun\tilde{K})^\top\un $ \;}
+    }
+    $\tilde{P} \leftarrow \Dun\tilde{K}\Ddeux$ \com{$\in\Delta_{n\times n}$?}\;
+    $\hat{W} \leftarrow \sum_{i=1}^n \log(\Dun)_{ii} (\tilde{P}\un)_i + \sum_{j=1}^n \log(\Ddeux)_{jj} (\tilde{P}^\top\un)_j$\;
+    \Return{$\Dun,\Ddeux,\hat{W}$}
+\end{algorithm}
+
+\begin{theorem5} \quad \\
+If
+$\tilde{K}\in R^{n\times n}_{>0}$ approximate $K=e^{-\eta C}$ with error $$\|\log K - \log\tilde{K}\|_\infty \leq \epsilon'=\min\bigg(1, \frac{\epsilon\eta}{50(\|C\|_\infty\eta + \log\frac{n}{\eta\epsilon})}\bigg),$$\\ 
+then
+\prettyref{algo:sink} output values $\Dun,\Ddeux,\hat{W}$ such that
+\begin{IEEEeqnarray}{rCl}
+|V_C(P^\eta) - V_C(\tilde{P})| &\leq& \frac{\epsilon}{2} \label{eq:err1} \\
+ |\hat{W} - V_C(\tilde{P})| &\leq& \frac{\epsilon}{2} \label{eq:err2}
+\end{IEEEeqnarray}
 \end{theorem5}
+\begin{proof} \quad \\
+\textbf{Let's proof \prettyref{eq:err1} first.} As stated before, the exact optimal solution is the Sinkhorn projection of K in the feasible space: $V_C(P^\eta)= V_C(\proj(K))$ (Corollary 1 in \cite{ref1}). We decompose the error by triangle inequality and treat each error term one by one:
+
+\begin{IEEEeqnarray}{rCl}
+|V_C(\proj(K))-V_C(\tilde{P})| 
+    &\leq& | V_C(\proj(K)) - V_{C}(\proj(\tilde{K})) | \label{eq:errorterm1}\\
+    &\leq& | V_C(\proj(\tilde{K})) - V_{\tilde{C}}(\proj(\tilde{K})) | \label{eq:errorterm2}\\
+    &\leq& | V_{\tilde{C}}(\proj(\tilde{K})) - V_{\tilde{C}}(\tilde{P}) | \label{eq:errorterm3}\\
+    &\leq& | V_{\tilde{C}}(\tilde{P}) - V_{C}(\tilde{P}) | \label{eq:errorterm4} \end{IEEEeqnarray}
+
+\begin{description}
+
+\item[Term \prettyref{eq:errorterm1}:]
+    We need to use regularity of $\proj$ and $V_C$:
+    by Proposition 2 in \cite{ref1} and hypothesis on $\tilde{K}$,
+    $$\|\proj(K) - \proj(\tilde{K})\|_\infty \leq \|\log K - \log \tilde(K)\| \leq \epsilon'.$$
+    
+    We get then by Lemma A in \cite{ref1} that
+    $$| V_C(\proj(K)) - V_{C}(\proj(\tilde{K})) | 
+    \leq \epsilon'\|C\|_\infty + \eta^{-1} \epsilon' \log(\frac{2n}{\epsilon'}).$$
+    
+\item[Term \prettyref{eq:errorterm2} and \prettyref{eq:errorterm4}:]
+    We need to use the regularity of $C\mapsto V_C$. For all $Q\in\Delta_{n\times n}$ we have
+    
+    \begin{IEEEeqnarray*}{rCl}
+    |V_C(Q) - V_{\tilde{C}}(Q)| 
+    &=& |\ps{C-\tilde{C}}{Q}|
+    \leq \|C-\tilde{C}\|_\infty\|Q\|_1
+    = \|C-\tilde{C}\|_\infty  \\
+    &=& \eta^{-1}\|\log K-\log\tilde{K}\|_\infty 
+    \leq \eta^{-1}\epsilon'
+    \end{IEEEeqnarray*}
+    
+    (This is Lemma C in \cite{ref1}). In particular, taking alternatively $\proj(\tilde{K})$ and $\tilde{P}$ for Q, gives 
+    $$| V_C(\proj(\tilde{K})) - V_{\tilde{C}}(\proj(\tilde{K})) | 
+    \leq \eta^{-1}\epsilon'$$
+    and 
+    $$| V_{\tilde{C}}(\tilde{P}) - V_{C}(\tilde{P}) | 
+    \leq  \eta^{-1}\epsilon'$$
+    
+\item[Term \prettyref{eq:errorterm3}:]
+    The proposition \cite{ref1} measure this error. From the stopping criterion in line 6 of \prettyref{algo:sink},
+    $\|\tilde{P}-p'\|_1 + \|\tilde{P}^\top\un-q'\|_1 < \frac{\delta}{2} \leq 1$ and $\tilde{P}\in\Delta_{n\times n}$\com{pas prouvé dans le paper} so 
+    $$| V_{\tilde{C}}(\proj(\tilde{K})) - V_{\tilde{C}}(\tilde{P}) | \leq \epsilon'\|\tilde{C}\|_\infty + \eta^{-1} \epsilon' \log(\frac{2n}{\epsilon'})$$
+    
+\end{description}
+We can now add all bounds together:
+\begin{IEEEeqnarray*}{rCl}
+|V_C(\proj(K))-V_C(\tilde{P})|
+&\leq& \epsilon'\|C\|_\infty + \eta^{-1} \epsilon' \log(\frac{2n}{\epsilon'}) 
++ 2\eta^{-1}\epsilon' + \epsilon'\|\tilde{C}\|_\infty 
++ \eta^{-1} \epsilon' \log(\frac{2n}{\epsilon'}) \\
+&=& \epsilon'(\|C\|_\infty + \|\tilde{C}\|_\infty + 2\eta^{-1} +2\eta^{-1}\log(\frac{2n}{\epsilon'})).
+\end{IEEEeqnarray*}
+Since 
+$\|\tilde{C}\|_\infty  
+\leq \|C\|_\infty + \|\tilde{C}-C\|_\infty
+\leq \|C\|_\infty + \eta^{-1}\epsilon'
+\leq \|C\|_\infty + \eta^{-1}$, we finally get
+\begin{IEEEeqnarray*}{rCl}
+|V_C(\proj(K))-V_C(\tilde{P})|
+&\leq& \epsilon'(2\|C\|_\infty + 3\eta^{-1} +2\eta^{-1}\log(\frac{2n}{\epsilon'}))
+\end{IEEEeqnarray*}
+When $\epsilon'=\min\big(1, \frac{\epsilon\eta}{50(\|C\|_\infty\eta + \log\frac{n}{\eta\epsilon})}\big)$ we can show with a bit of algebra (Lemma M in \cite{ref1}) that this is indeed smaller than $\epsilon/2$.
+
+\textbf{Now let's show \prettyref{eq:err2}.} By definition, $V_{\tilde{C}}(\tilde{P}) = \ps{C}{\tilde{P}} - \eta^{-1} H(\tilde{P})$. The formula for $\hat{W}$ that is in line 15 of \prettyref{algo:sink}, rewrite this in a more computationally efficient way. The proof of the equivalence is Lemma M in \cite{ref1}. As a result, 
+$$|\hat{W}-V_C(\tilde{P})| = |V_{\tilde{C}}(\tilde{P})-V_C(\tilde{P})|
+\leq \|\tilde{C}-C\|_\infty 
+\leq \eta^{-1}\epsilon' < \epsilon/2$$
+
+
+\end{proof}
 
 \com{j'ai créé les références ci-dessous dans le fichier "ref.bib". Faire attention au fait que les labels des reférences (ref1,ref2,ref3) c'est ceux tels qu'ils sont dans la description dur projet, ça sera prob. des chifres différents ici.}
 \nocite{*}
