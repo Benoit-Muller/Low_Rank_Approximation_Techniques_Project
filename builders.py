@@ -1,12 +1,20 @@
 ''' Builders functions that create variables and files '''
+
 import numpy as np
 import matplotlib.pyplot as plt
 
-''' Fonctions utiles pour les images
-image   -> tenseur : img = plt.imread("image.png")
-tenseur -> display : plt.imshow(img)
-tenseur -> image   : plt.imsave("image2.png",img)
+'''     
+Fonctions utiles pour les images :
+- image   -> tenseur : img = plt.imread("image.png")
+- tenseur -> display : plt.imshow(img)
+- tenseur -> image   : plt.imsave("image2.png",img)
+
+Formats:
+- Le format de pyplot: des tenseurs (N,N,3) avec n=N^2 le nombre de pixel.
+- Celui qu'on utilise pour nos calculs: des matrices (N^2,3)=(n,3), vectorisation du tenseur.
 '''
+
+
 def image2array(name):
     ''' Read an image file and put it on a array
     Input
