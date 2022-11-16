@@ -4,8 +4,8 @@ import numpy as np
 def sinkhorn(K,Kt,p,q,delta):
     ''' Sinkhorn algorithm that compute an approximation of the Sinkhorn projection.
     Inputs
-            K : function of signature K(v), compute K@v matrix-vector multiplication with the kernel.
-            Kt : function of signature Kt(v), compute K^T@v matrix-vector multiplication.
+            K : function of signature K(v), matrix-vector multiplication with Gibbs kernel.
+            Kt : function of signature Kt(v), matrix-vector multiplication with with transposed Gibbs kernel.
             p,q : arrays of shape (n,1), the target marginals ( sum(P,axis=0,1) = p,q )
             delta : positive scalar,the tolerance.
     Outputs
@@ -14,7 +14,7 @@ def sinkhorn(K,Kt,p,q,delta):
     '''
     (n,_) = np.shape(p)
     tau= delta/8
-    u,v = np.ones(n,1), np.ones(n,1) # initialize
+    u,v = np.ones((n,1)), np.ones((n,1)) # initialize
     # un = np.ones(n,1) # not used
     p,q = (1-tau)*p + tau/n, (1-tau)*q + tau/n # increase support
     k = 0
