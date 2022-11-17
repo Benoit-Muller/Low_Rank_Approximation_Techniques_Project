@@ -1,7 +1,7 @@
 # The Sinkhorn algorithm
 import numpy as np
 
-def sinkhorn(K,Kt,p,q,delta,maxiter=10000):
+def sinkhorn(K,Kt,p,q,delta,maxiter=100):
     ''' Sinkhorn algorithm that compute an approximation of the Sinkhorn projection.
     Inputs
             K : function of signature K(v), matrix-vector multiplication with Gibbs kernel.
