@@ -41,9 +41,9 @@ def array2cost(source_img,target_img):
     Output
             C: array of shape (n,n), the cost matrix associated to the two images
             m1, m2: array of shape(n,1), uniform stochastic vectors'''
-    source_img = source_img[np.newaxis, :, 3]
-    target_img = target_img[:, np.newaxis, 3]
-    C = sum((source_img - target_img)**2, axis=2)
+    source_img = source_img[np.newaxis, :, :]
+    target_img = target_img[:, np.newaxis, :]
+    C = np.sum((source_img - target_img)**2, axis=2)
     n = np.shape(C)[0]
     m1, m2 = np.ones((n,1))/n, np.ones((n,1))/n
     return C,m1,m2
