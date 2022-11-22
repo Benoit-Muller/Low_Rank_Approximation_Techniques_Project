@@ -32,8 +32,8 @@ def sinkhorn(K,Kt,p,q,delta,maxtime=60):
         norm_u.append(np.linalg.norm(u)) #debuging
         norm_v.append(np.linalg.norm(v)) #debuging
         err.append(np.sum(np.abs(u*K(v) - p)) + np.sum(np.abs(v*Kt(u) - q))) #debuging
-    W = (np.log(u).T @ (u*K(v)) + np.log(v).T @ (v*Kt(u))) #/eta !...
-    # ...erreur dans le paper, mais on a pas accès à teta ici, à voir si on le rajoute en paramètre
+    W = (np.log(u).T @ (u*K(v)) + np.log(v).T @ (v*Kt(u))) # /eta !...
+    # ...erreur dans le paper, mais on a pas accès à eta ici, à voir si on le rajoute en paramètre
     # ou si on garde eta=1
     W=np.squeeze(W) # sinon donne [[W]]
     return u,v,W,norm_u,norm_v,err
