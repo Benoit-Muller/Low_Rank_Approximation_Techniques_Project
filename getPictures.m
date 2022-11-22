@@ -38,3 +38,4 @@ X4 = reshape(rgbImage,n^2,3);
 imwrite(reshape(X1,n,n,3),"img1_" + num2str(n) + ".jpg")
 imwrite(reshape(X2,n,n,3),"img2_" + num2str(n) + ".jpg")
 imwrite(reshape(X3,n,n,3),"img3_" + num2str(n) + ".jpg")
+imwrite(reshape(X4,n,n,3),"img4_" + num2str(n) + ".jpg")

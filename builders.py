@@ -66,5 +66,6 @@ def transfer_color(P,img):
             P: array of shape (n,n), coupling
             img: array of shape (n,3), the array associated to an image
     Output
-            : array of shape (n,3), the array associated to the new colored image'''
-    return P.T@img
+            : array of shape (n,3), the array associated to the new colored image '''
+    q =  np.sum(P,axis=1)
+    return P@img / q[:,np.newaxis] # ATTENTION erreur dans la desciption du projet!
