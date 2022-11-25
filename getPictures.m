@@ -1,4 +1,4 @@
-% Creates the vectors for the color transfer example
+% Creates the vectors and images for the color transfer example
 % This function requires that you manually add the val2017 dataset from the of the Coco Dataset to the Matlab path. 
 
 n = 100;
