@@ -6,3 +6,7 @@ PDF des références:
 - [3] [Adaptive color transfer with relaxed optimal transport](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7025983)
 
 Prendre des images de 100 par 100
+
+On peut afficher nos images dans le README mdr:
+
+![le chat](img4_100.jpg?raw=true "Title") + ![le Big Ben](img2_100.jpg?raw=true "Title") = ![le chat dans le Big Ben](img42.jpg?raw=true "Title")
