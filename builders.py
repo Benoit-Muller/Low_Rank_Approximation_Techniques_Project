@@ -23,14 +23,23 @@ def image2array(name):
             :array of shape (N^2,3), the array associated to the (N,N)-image '''
     return np.reshape(plt.imread(name), (-1,3)) / 256 # à garder?
 
+def array2matrix(img):
+    ''' Write an image file from an array
+    Input
+            img: array of shape (N^2,3), the array associated to the (N,N)-image
+    Output
+            array of shape (N^2,3), the array associated to the (N,N)-image '''
+    N = int(round(np.sqrt(np.shape(img)[0])))
+    return np.reshape(img,(N,N,3))
+    return
+
 def array2image(name, img):
     ''' Write an image file from an array
     Input
             name: string, the future name of an image file with extension
             img: array of shape (N^2,3), the array associated to the (N,N)-image
     No Output '''
-    N = int(round(np.sqrt(np.shape(img)[0])))
-    plt.imsave(name, np.reshape(img,(N,N,3)),vmin=0, vmax=1) # entre 0 et 1
+    plt.imsave(name, array2matrix(img),vmin=0, vmax=1) # entre 0 et 1
     return
 
 def array2cost(source_img,target_img):
