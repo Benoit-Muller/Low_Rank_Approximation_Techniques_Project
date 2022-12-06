@@ -31,8 +31,7 @@ def sinkhorn(K,Kt,p,q,delta,maxtime=60):
         else:
             v = q / Kt(u)
         err.append(np.sum(np.abs(u*K(v) - p)) + np.sum(np.abs(v*Kt(u) - q))) #debuging
-        
-    if time.time()>=maxtime:
+    if (time.time()-t)>=maxtime:
         warnings.warn("Maximum time of sinkhorn achieved.")
     # rescalling to avoid overflow
     u = u / np.min(u) # do we risk division by a "too small" number?
@@ -106,10 +105,12 @@ def low_rank_Sinkhorn(Kmat,k,p,q,delta,maxtime=60):
         return US@(V@v)
     def Kt(v):
         return V.T@(US.T@v)
+    S_time=time.time()
     [u,v,W,err]=sinkhorn(K,Kt,p,q,delta,maxtime=60)
+    end_time=time.time()-S_time
     P=u*Kmat*v.T
     P=(u*US)@(V*v.T) #computing associated coupling P matrix
-    return [u,v,W,err, P]
+    return [u,v,W,err, P, end_time]
 
 
 
