@@ -2,6 +2,7 @@
 import numpy as np
 import time
 from sklearn.decomposition import TruncatedSVD
+import warnings
 
 def sinkhorn(K,Kt,p,q,delta,maxtime=60):
     ''' Sinkhorn algorithm that compute an approximation of the Sinkhorn projection.
@@ -32,9 +33,12 @@ def sinkhorn(K,Kt,p,q,delta,maxtime=60):
         err.append(np.sum(np.abs(u*K(v) - p)) + np.sum(np.abs(v*Kt(u) - q))) #debuging
         
     if time.time()>=maxtime:
-        print("maxtime achieved")
-        
-    if (np.min(u)<10**(-10)) or (np.min(v)<10**(-10)): #to see if keep or not
+        warnings.warn("Maximum time of sinkhorn achieved.")
+    # rescalling to avoid overflow
+    u = u / np.min(u) # do we risk division by a "too small" number?
+    v = v * np.min(u)
+    if (np.min(u) < 1e-10) or (np.min(v) < 1e-10): #to see if keep or not
+        warnings.warn("Overflow in sinkorn, arbitrary value assigned to W.") # put back lign number 24?
         W=-9999
     else:
         W = (np.log(u).T @ (u*K(v)) + np.log(v).T @ (v*Kt(u))) # /eta !...
