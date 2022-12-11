@@ -95,8 +95,10 @@ def low_rank_Sinkhorn(Kmat,k,p,q,delta,maxtime=60):
         delta : positive scalar,the tolerance.
     Outputs
         u,v : arrays of shape (n,1), the scaling vectors that define P = diag(u)Kdiag(v).
-            W   : scalar, the associated wasserstein cost.
-            norm_u,norm_v,err : some norms and error
+        W   : scalar, the associated wasserstein cost.
+        err : array, the evolution of the marginal error
+        P : array of shape (n,n) the coupling matrix corresponding to our optimal transport problem
+        end_time : float, the time in took to run the Sinkhorn algorithm when the low rank approximation and the SVD are already computed
     '''
     svd=TruncatedSVD(k)
     US=svd.fit_transform(Kmat) 
