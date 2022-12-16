@@ -4,14 +4,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 '''     
-Fonctions utiles pour les images :
-- image   -> tenseur : img = plt.imread("image.png")
-- tenseur -> display : plt.imshow(img)
-- tenseur -> image   : plt.imsave("image2.png",img)
+Usefull functions for images :
+- image   -> tensor : img = plt.imread("image.png")
+- tensor -> display : plt.imshow(img)
+- tensor -> image   : plt.imsave("image2.png",img)
 
 Formats:
-- Le format de pyplot: des tenseurs (N,N,3) avec n=N^2 le nombre de pixel.
-- Celui qu'on utilise pour nos calculs: des matrices (N^2,3)=(n,3), vectorisation du tenseur.
+- Pyplot: tensors (N,N,3) with n=N^2 the number of pixel.
+- Our functions: matrices (N^2,3)=(n,3), vectorization of the tensor.
 '''
 
 

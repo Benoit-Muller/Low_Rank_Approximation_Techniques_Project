@@ -10,40 +10,39 @@ def sinkhorn(K,Kt,p,q,delta=1e-15,maxtime=60):
             K : function of signature K(v), matrix-vector multiplication with Gibbs kernel.
             Kt : function of signature Kt(v), matrix-vector multiplication with with transposed Gibbs kernel.
             p,q : arrays of shape (n,1), the target marginals ( sum(P,axis=0,1) = p,q )
-            delta : positive scalar,the tolerance.
+            delta : positive scalar, the tolerance for the marginal error.
     Outputs
             u,v : arrays of shape (n,1), the scaling vectors that define P = diag(u)Kdiag(v).
-            W   : scalar, the associated wasserstein cost.
+            W   : scalar, the associated regularized Wasserstein cost (must be multiplied by eta).
             err : array, the evolution of the marginal error (debugging purpose)
     '''
     t = time.time()
     (n,_) = np.shape(p)
-    tau= delta/8
+    # tau= delta/8
     u,v = np.ones((n,1)), np.ones((n,1)) # initialize
     un = np.ones((n,1))
-    #p,q = (1-tau)*p + tau/n, (1-tau)*q + tau/n # increase support?
+    tau= delta/8
+    # p,q = (1-tau)*p + tau/n, (1-tau)*q + tau/n # uncomment to increase support and smooth
     k = 0
     err = [ np.sum(np.abs(u*K(v) - p)) + np.sum(np.abs(v*Kt(u) - q)) ] #debuging
     while err[-1] >= delta/2 and time.time()-t < maxtime :
         k=k+1
         if k%2 == 1:
-            u = p / K(v)
+            u = p / K(v) # row rescaling
         else:
-            v = q / Kt(u)
-        err.append(np.sum(np.abs(u*K(v) - p)) + np.sum(np.abs(v*Kt(u) - q))) #debuging
+            v = q / Kt(u) # column rescaling
+        err.append(np.sum(np.abs(u*K(v) - p)) + np.sum(np.abs(v*Kt(u) - q))) # marginal error
     if (time.time()-t)>=maxtime:
         warnings.warn("Maximum time of sinkhorn achieved.")
-    # rescalling to avoid overflow
+    # reparametring to avoid overflow:
     u = u / np.min(u)
     v = v * np.min(u)
-    if (np.min(u) < 1e-10) or (np.min(v) < 1e-10): #to see if keep or not
-        warnings.warn("Overflow in sinkorn, arbitrary value assigned to W.") # put back lign number 24?
+    if (np.min(u) < 1e-10) or (np.min(v) < 1e-10):
+        warnings.warn("Overflow in sinkorn, arbitrary value -9999 assigned to W.")
         W=-9999
     else:
-        W = (np.log(u).T @ (u*K(v)) + np.log(v).T @ (v*Kt(u))) # /eta !...
-    # ...erreur dans le paper, mais on a pas accès à eta ici, à voir si on le rajoute en paramètre
-    # ou si on garde eta=1
-    W=np.squeeze(W) # sinon donne [[W]]
+        W = (np.log(u).T @ (u*K(v)) + np.log(v).T @ (v*Kt(u))) 
+    W=np.squeeze(W)
     return u,v,W,err
 
 
