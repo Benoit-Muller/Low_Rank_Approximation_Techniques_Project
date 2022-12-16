@@ -4,7 +4,7 @@ import time
 from sklearn.decomposition import TruncatedSVD
 import warnings
 
-def sinkhorn(K,Kt,p,q,delta=1e-15,maxtime=60):
+def sinkhorn(K,Kt,p,q,delta=1e-10,maxtime=60):
     ''' Sinkhorn algorithm that compute an approximation of the Sinkhorn projection.
     Inputs
             K : function of signature K(v), matrix-vector multiplication with Gibbs kernel.
