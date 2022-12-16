@@ -109,7 +109,7 @@ def low_rank_Sinkhorn(Kmat,k,p,q,delta,maxtime=60):
     S_time=time.time()
     [u,v,W,err]=sinkhorn(K,Kt,p,q,delta,maxtime=60)
     end_time=time.time()-S_time
-    P=u*Kmat*v.T
+    # P=u*Kmat*v.T
     P=(u*US)@(V*v.T) #computing associated coupling P matrix
     return [u,v,W,err, P, end_time]
 
