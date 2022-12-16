@@ -50,8 +50,8 @@ def array2cost(source_img,target_img):
     Output
             C: array of shape (n,n), the cost matrix associated to the two images
             m1, m2: array of shape(n,1), uniform stochastic vectors'''
-    source_img = source_img[np.newaxis, :, :]
-    target_img = target_img[:, np.newaxis, :]
+    source_img = source_img[:,np.newaxis, :]
+    target_img = target_img[np.newaxis,: , :]
     C = np.sum((source_img - target_img)**2, axis=2)
     n = np.shape(C)[0]
     m1, m2 = np.ones((n,1))/n, np.ones((n,1))/n
@@ -77,4 +77,4 @@ def transfer_color(P,img):
     Output
             : array of shape (n,3), the array associated to the new colored image '''
     q =  np.sum(P,axis=1)
-    return P@img / q[:,np.newaxis] # ATTENTION erreur dans la desciption du projet!
+    return P.T@img / q[:,np.newaxis] # ATTENTION erreur dans la desciption du projet!

@@ -4,7 +4,7 @@ import time
 from sklearn.decomposition import TruncatedSVD
 import warnings
 
-def sinkhorn(K,Kt,p,q,delta,maxtime=60):
+def sinkhorn(K,Kt,p,q,delta=1e-15,maxtime=60):
     ''' Sinkhorn algorithm that compute an approximation of the Sinkhorn projection.
     Inputs
             K : function of signature K(v), matrix-vector multiplication with Gibbs kernel.
@@ -34,7 +34,7 @@ def sinkhorn(K,Kt,p,q,delta,maxtime=60):
     if (time.time()-t)>=maxtime:
         warnings.warn("Maximum time of sinkhorn achieved.")
     # rescalling to avoid overflow
-    u = u / np.min(u) # do we risk division by a "too small" number?
+    u = u / np.min(u)
     v = v * np.min(u)
     if (np.min(u) < 1e-10) or (np.min(v) < 1e-10): #to see if keep or not
         warnings.warn("Overflow in sinkorn, arbitrary value assigned to W.") # put back lign number 24?
