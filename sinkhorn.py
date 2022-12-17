@@ -35,8 +35,9 @@ def sinkhorn(K,Kt,p,q,delta=1e-10,maxtime=60):
     if (time.time()-t)>=maxtime:
         warnings.warn("Maximum time of sinkhorn achieved.")
     # reparametring to avoid overflow:
-    u = u / np.min(u)
-    v = v * np.min(u)
+    m=np.min(u)
+    u = u / m
+    v = v * m
     if (np.min(u) < 1e-10) or (np.min(v) < 1e-10):
         warnings.warn("Overflow in sinkorn, arbitrary value -9999 assigned to W.")
         W=-9999
@@ -109,7 +110,6 @@ def low_rank_Sinkhorn(Kmat,k,p,q,delta,maxtime=60):
     S_time=time.time()
     [u,v,W,err]=sinkhorn(K,Kt,p,q,delta,maxtime=60)
     end_time=time.time()-S_time
-    # P=u*Kmat*v.T
     P=(u*US)@(V*v.T) #computing associated coupling P matrix
     return [u,v,W,err, P, end_time]
 
